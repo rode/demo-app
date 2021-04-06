@@ -13,7 +13,7 @@ pipeline {
                     }
                 }
                 container('kaniko') {
-                    sh "executor -c app --skip-tls-verify --digest-file image -d harbor.localhost/rode-demo/rode-demo-node-app:${tag}"
+                    sh "executor --skip-tls-verify --digest-file image -d harbor.localhost/rode-demo/rode-demo-node-app:${tag}"
                 }
                 container('git') {
                     sh '''
@@ -21,7 +21,7 @@ pipeline {
                     commit=$(git rev-parse HEAD)
                     wget -O- \
                     --post-data='{
-                        "repository": "https://github.com/rode/demo",
+                        "repository": "https://github.com/rode/demo-app",
                         "artifacts": [
                             "https://harbor.localhost/rode-demo/rode-demo-node-app@'$image'"
                         ],
