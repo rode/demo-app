@@ -13,7 +13,7 @@ pipeline {
                     }
                 }
                 container('kaniko') {
-                    sh "executor -c `pwd` --skip-tls-verify --digest-file image -d harbor.localhost/rode-demo/rode-demo-node-app:${tag}"
+                    sh "executor -c . --skip-tls-verify --digest-file image -d harbor.localhost/rode-demo/rode-demo-node-app:${tag}"
                 }
                 container('git') {
                     sh '''
