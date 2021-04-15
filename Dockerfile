@@ -1,4 +1,4 @@
-FROM node:current-alpine3.10
+FROM node:8-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -16,6 +16,5 @@ RUN npm install
 COPY . .
 
 EXPOSE 8081
-RUN apk update && apk add libusb-compat
 
 CMD [ "node", "server.js" ]
