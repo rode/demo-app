@@ -1,4 +1,4 @@
-FROM node:current-alpine3.10
+FROM node:current-alpine3.8
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -16,5 +16,5 @@ RUN npm install
 COPY . .
 
 EXPOSE 8081
-RUN apk update && apk add netcat
+
 CMD [ "node", "server.js" ]
