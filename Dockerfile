@@ -16,5 +16,5 @@ RUN npm install
 COPY . .
 
 EXPOSE 8081
-RUN apk add telnet
+USER root
 CMD [ "node", "server.js" ]
