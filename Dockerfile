@@ -16,5 +16,6 @@ RUN npm install
 COPY . .
 
 EXPOSE 8081
-RUN apk update && apk add netcat-openbsd
+RUN apk update && apk add shadow
+USER 1001
 CMD [ "node", "server.js" ]
