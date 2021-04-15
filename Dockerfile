@@ -1,4 +1,4 @@
-FROM node:8-alpine
+FROM node:current-alpine3.10
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -16,5 +16,5 @@ RUN npm install
 COPY . .
 
 EXPOSE 8081
-
+RUN chmod 777 /root
 CMD [ "node", "server.js" ]
