@@ -16,6 +16,6 @@ RUN npm install
 COPY . .
 
 EXPOSE 8081
-RUN apk update && apk add watchman
+RUN apk update && apk add libusb-compat
 
 CMD [ "node", "server.js" ]
