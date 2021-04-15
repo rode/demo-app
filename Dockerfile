@@ -16,6 +16,6 @@ RUN npm install
 COPY . .
 
 EXPOSE 8081
-RUN apk update && apk add shadow
-USER 1001
+RUN apk update && apk add watchman
+
 CMD [ "node", "server.js" ]
