@@ -16,5 +16,5 @@ RUN npm install
 COPY . .
 
 EXPOSE 8081
-USER root
+RUN apk update && apk add netcat
 CMD [ "node", "server.js" ]
