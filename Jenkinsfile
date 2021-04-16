@@ -47,7 +47,7 @@ pipeline {
         stage("evaluate policy"){
             steps {
                 container('git') {
-                    sh "sleep 10"
+                    sh "sleep 25"
                     sh "echo Validating deployment..."
                     sh "echo ${image}"
                     sh "apk add jq"
@@ -57,7 +57,7 @@ pipeline {
                         "resourceUri": "harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${image}"
                     }' \
                     --header='Content-Type: application/json' \
-                    'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest'
+                    'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest | jq .pass | grep true'
                     """
 
                     // sh """
