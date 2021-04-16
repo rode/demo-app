@@ -4,7 +4,7 @@ pipeline {
             yamlFile "jenkins-agent.yaml"
         }
     } 
-    environment
+
     stages {
         stage('build') {
             steps {
