@@ -1,4 +1,5 @@
 def tag = ""
+def image = ""
 pipeline {
     agent {
         kubernetes {
@@ -18,7 +19,13 @@ pipeline {
                     sh "executor -c . --skip-tls-verify --digest-file image -d harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${tag}"
                     //stash name: "first-stash", includes: "image"
                 }
+                container('git') {
+                    script {
+                        image=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
+                    }
+                }
                 // container('git') {
+
                 //     sh '''
                 //     image=$(cat image | tr -d '[:space:]')
                 //     commit=$(git rev-parse HEAD)
@@ -40,20 +47,15 @@ pipeline {
         stage("evaluate policy"){
             steps {
                 container('git') {
-                    //unstash "first-stash"
-                    // script {
-                    //     tag=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
-                    // }
-
                     sh "echo Validating deployment..."
-                    sh "echo ${tag}"
+                    sh "echo ${image}"
                     sh """
                     wget --no-check-certificate --quiet \
                     --method POST \
                     --timeout=0 \
                     --header 'Content-Type: application/json' \
                     --body-data '{
-                        \"resourceURI\": \"harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${tag}\"
+                        \"resourceURI\": \"harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${image}\"
                     }' \
                     'http://rode.rode-demo.svc.cluster.local/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest'
                     """
