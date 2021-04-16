@@ -51,7 +51,7 @@ pipeline {
                     sh "echo ${image}"
 
                     sh """
-                    wget -O- \
+                    wget -O- --server-response\
                     --post-data='{
                         "resourceUri": "harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${image}"
                     }' \
@@ -77,7 +77,7 @@ pipeline {
             steps {
                  container('helm') {
                     sh "helm version"
-                    sh "helm install demo-app-test charts/demo-app -n rode-demo-app"
+                    sh "helm upgrade --install demo-app-test charts/demo-app -n rode-demo-app"
                 }
             }
         }
