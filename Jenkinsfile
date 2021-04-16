@@ -21,7 +21,7 @@ pipeline {
                 }
                 container('git') {
                     script {
-                        image=sh(script: "cat image | tr -d '[:space:]' | sed \"s/sha256://g\"", returnStdout: true).trim()
+                        image=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
                     }
                 }
                 // container('git') {
