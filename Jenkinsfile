@@ -36,22 +36,30 @@ pipeline {
             
             }
         }
-        stage('deploy') {
+        stage("evaluate policy"){
             steps {
                 container('git') {
                     unstash "first-stash"
                     script {
-                        tag=$(cat image | tr -d '[:space:]')
+                        tag=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
                     }
-                }
 
-                 container('helm') {
                     sh "echo Validating deployment..."
-                    sh "curl --location --request POST 'http://rode.rode-demo.svc.cluster.local/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest' \
+                    sh "wget --no-check-certificate --quiet \
+                    --method POST \
+                    --timeout=0 \
                     --header 'Content-Type: application/json' \
-                    --data-raw '{
-                        \"resourceURI\": \"harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${tag}\"
-                    }'"
+                    --body-data '{
+                        \"resourceURI\": \"harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:9d6fefcea1770f184d91bd6abdadbbc1aa820849393a7fa4671ee39e407e1950\"
+                    }' \
+                    'http://rode.rode-demo.svc.cluster.local/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest'"
+                }
+            }
+        }
+
+        stage('deploy') {
+            steps {
+                 container('helm') {
                     sh "helm version"
                     sh "helm install demo-app-test charts/demo-app -n rode-demo-app"
                 }
