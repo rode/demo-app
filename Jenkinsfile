@@ -49,16 +49,26 @@ pipeline {
                 container('git') {
                     sh "echo Validating deployment..."
                     sh "echo ${image}"
+
                     sh """
-                    wget --no-check-certificate --quiet \
-                    --method POST \
-                    --timeout=0 \
-                    --header 'Content-Type: application/json' \
-                    --body-data '{
-                        \"resourceURI\": \"harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${image}\"
+                    wget -O- \
+                    --post-data='{
+                        "resourceURI": "harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${image}"
                     }' \
+                    --header='Content-Type: application/json' \
                     'http://rode.rode-demo.svc.cluster.local/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest'
                     """
+
+                    // sh """
+                    // wget --no-check-certificate --quiet \
+                    // --method POST \
+                    // --timeout=0 \
+                    // --header 'Content-Type: application/json' \
+                    // --body-data '{
+                    //     \"resourceURI\": \"harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${image}\"
+                    // }' \
+                    // 'http://rode.rode-demo.svc.cluster.local/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest'
+                    // """
                 }
             }
         }
