@@ -31,6 +31,11 @@ pipeline {
                 //     'http://rode-collector-build.rode-demo.svc.cluster.local:8083/v1alpha1/builds'
                 //     '''
                 // }
+                container('helm') {
+                    sh "echo Hello"
+                    sh "helm version"
+                    sh "helm install demo-app-test charts/demo-app -n rode-demo-app"
+                }
             }
         }
     }
