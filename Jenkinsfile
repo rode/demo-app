@@ -52,7 +52,7 @@ pipeline {
                     sh "echo ${image}"
                     sh "apk add jq"
                     sh """
-                    wget -O- --server-response\
+                    wget -O- \
                     --post-data='{
                         "resourceUri": "harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${image}"
                     }' \
