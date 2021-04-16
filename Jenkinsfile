@@ -1,10 +1,11 @@
+def tag = ""
 pipeline {
     agent {
         kubernetes {
             yamlFile "jenkins-agent.yaml"
         }
     } 
-
+    
     stages {
         stage('build') {
             steps {
@@ -15,7 +16,7 @@ pipeline {
                 }
                 container('kaniko') {
                     sh "executor -c . --skip-tls-verify --digest-file image -d harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${tag}"
-                    stash name: "first-stash", includes: "image"
+                    //stash name: "first-stash", includes: "image"
                 }
                 // container('git') {
                 //     sh '''
@@ -39,22 +40,23 @@ pipeline {
         stage("evaluate policy"){
             steps {
                 container('git') {
-                    unstash "first-stash"
-                    script {
-                        tag=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
-                    }
+                    //unstash "first-stash"
+                    // script {
+                    //     tag=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
+                    // }
 
                     sh "echo Validating deployment..."
-                    sh '''
+                    sh "echo ${tag}"
+                    sh """
                     wget --no-check-certificate --quiet \
                     --method POST \
                     --timeout=0 \
                     --header 'Content-Type: application/json' \
                     --body-data '{
-                        \"resourceURI\": \"harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:9d6fefcea1770f184d91bd6abdadbbc1aa820849393a7fa4671ee39e407e1950\"
+                        \"resourceURI\": \"harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${tag}\"
                     }' \
                     'http://rode.rode-demo.svc.cluster.local/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest'
-                    '''
+                    """
                 }
             }
         }
