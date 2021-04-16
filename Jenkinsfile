@@ -17,14 +17,12 @@ pipeline {
                 }
                 container('kaniko') {
                     sh "executor -c . --skip-tls-verify --digest-file image -d harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${tag}"
+
                 }
                 container('git') {
                     script {
                         image=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
                     }
-                }
-                container('git') {
-
                     sh '''
                     image=$(cat image | tr -d '[:space:]')
                     commit=$(git rev-parse HEAD)
