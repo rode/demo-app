@@ -24,13 +24,13 @@ pipeline {
                         image=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
                     }
                     sh '''
-                    image=$(cat image | tr -d '[:space:]')
+                    imagesha=$(cat image | tr -d '[:space:]')
                     commit=$(git rev-parse HEAD)
                     wget -O- \
                     --post-data='{
                         "repository": "https://github.com/rode/demo-app",
                         "artifacts": [
-                            "https://harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app@'$image'"
+                            "https://harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app@'$imagesha'"
                         ],
                         "commit_id": "'$commit'"
                     }' \
