@@ -21,7 +21,7 @@ pipeline {
                 }
                 container('git') {
                     script {
-                        image=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
+                        image=sh(script: "cat image | tr -d '[:space:]' | sed \"s/sha256://g\"", returnStdout: true).trim()
                     }
                 }
                 // container('git') {
@@ -56,7 +56,7 @@ pipeline {
                         "resourceURI": "harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${image}"
                     }' \
                     --header='Content-Type: application/json' \
-                    'http://rode.rode-demo.svc.cluster.local/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest'
+                    'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest'
                     """
 
                     // sh """
