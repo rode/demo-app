@@ -47,10 +47,10 @@ pipeline {
         stage("evaluate policy"){
             steps {
                 container('git') {
-                    sh "sleep 25"
                     sh "echo Validating deployment..."
                     sh "echo ${image}"
                     sh "apk add jq"
+                    sh "sleep 25"
                     sh """
                     wget -O- \
                     --post-data='{
