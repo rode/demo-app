@@ -8,7 +8,7 @@ pipeline {
     }
 
     stages {
-        stage('build') {
+        stage('Build') {
             steps {
                 container('git') {
                     script {
@@ -42,7 +42,7 @@ pipeline {
             }
         }
 
-        stage('deploy') {
+        stage('Update Deploy Repo') {
             steps {
                  container('git') {
 					 withCredentials([string(credentialsId: 'github-deploy-pat', variable: 'GITHUB_PAT')]) {
