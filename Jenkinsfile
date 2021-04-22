@@ -48,7 +48,10 @@ pipeline {
 					 withCredentials([string(credentialsId: 'github-deploy-pat', variable: 'GITHUB_PAT')]) {
 						sh "apk add curl"
 						sh "apk add jq"
-						sh "deploy-dev.sh"
+						script {
+							imagesha=sh(script: "echo \"$image\" | tr -d '[:space:]' | sed 's/sha256://g'", returnStdout: true).trim()
+						}
+						sh "IMAGE_TAG=$imagesha ./deploy-dev.sh"
 					}
                 }
             }
