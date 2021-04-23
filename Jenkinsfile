@@ -43,6 +43,7 @@ pipeline {
         }
 
         stage('Update Deploy Repo') {
+            when { branch 'main' }
             steps {
                  container('git') {
 					 withCredentials([string(credentialsId: 'github-deploy-pat', variable: 'GITHUB_PAT')]) {
