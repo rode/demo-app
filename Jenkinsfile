@@ -30,7 +30,7 @@ pipeline {
                     --post-data='{
                         "repository": "https://github.com/rode/demo-app",
                         "artifacts": [
-                            "https://'$HARBOR_HOST'/rode-demo/rode-demo-node-app@'$imagesha'"
+                            "'$HARBOR_HOST'/rode-demo/rode-demo-node-app@'$imagesha'"
                         ],
                         "commit_id": "'$commit'"
                     }' \
