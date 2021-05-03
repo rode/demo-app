@@ -35,7 +35,7 @@ pipeline {
                         "commit_id": "'$commit'"
                     }' \
                     --header='Content-Type: application/json' \
-                    'http://rode-collector-build.${RODE_NAMESPACE}.svc.cluster.local:8083/v1alpha1/builds'
+                    'http://rode-collector-build.$RODE_NAMESPACE.svc.cluster.local:8083/v1alpha1/builds'
                     '''
                 }
 
