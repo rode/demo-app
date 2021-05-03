@@ -16,7 +16,7 @@ pipeline {
                     }
                 }
                 container('kaniko') {
-                    sh "executor -c . --skip-tls-verify --digest-file image -d harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app:${tag}"
+                    sh "executor -c . --skip-tls-verify --digest-file image -d $HARBOR_HOST/rode-demo/rode-demo-node-app:${tag}"
 
                 }
                 container('git') {
@@ -30,12 +30,12 @@ pipeline {
                     --post-data='{
                         "repository": "https://github.com/rode/demo-app",
                         "artifacts": [
-                            "https://harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app@'$imagesha'"
+                            "'$HARBOR_HOST'/rode-demo/rode-demo-node-app@'$imagesha'"
                         ],
                         "commit_id": "'$commit'"
                     }' \
                     --header='Content-Type: application/json' \
-                    'http://rode-collector-build.rode-demo.svc.cluster.local:8083/v1alpha1/builds'
+                    'http://rode-collector-build.'"$RODE_NAMESPACE"'.svc.cluster.local:8083/v1alpha1/builds'
                     '''
                 }
 
