@@ -17,28 +17,32 @@ pipeline {
                 }
                 container('kaniko') {
                     sh "executor -c . --skip-tls-verify --digest-file image -d $HARBOR_HOST/rode-demo/rode-demo-node-app:${tag}"
-
                 }
                 container('git') {
                     script {
                         image=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
                     }
                     sh '''
+                    env
+
                     imagesha=$(cat image | tr -d '[:space:]')
                     commit=$(git rev-parse HEAD)
                     wget -O- \
                     --post-data='{
                         "repository": "https://github.com/rode/demo-app",
                         "artifacts": [
-                            "'$HARBOR_HOST'/rode-demo/rode-demo-node-app@'$imagesha'"
+                            {
+                                "id": "'$HARBOR_HOST'/rode-demo/rode-demo-node-app@'$imagesha'"
+                            }
                         ],
-                        "commit_id": "'$commit'"
+                        "provenanceId": "'$BUILD_URL'",
+                        "logsUri": "'$BUILD_URL'/consoleText",
+                        "commitId": "'$commit'"
                     }' \
                     --header='Content-Type: application/json' \
                     'http://rode-collector-build.'"$RODE_NAMESPACE"'.svc.cluster.local:8083/v1alpha1/builds'
                     '''
                 }
-
             }
         }
 
