@@ -25,6 +25,10 @@ pipeline {
                         image=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
                     }
                     sh '''
+                    env
+                    echo '$tag'
+                    echo '$buildStart'
+
                     buildEnd=$(date -Iseconds)
                     imagesha=$(cat image | tr -d '[:space:]')
                     commit=$(git rev-parse HEAD)
@@ -41,11 +45,11 @@ pipeline {
                                 ]
                             }
                         ],
-                        "buildStart": "'$buildStart'"
-                        "buildEnd": "'$buildEnd'"
+                        "buildStart": "'$buildStart'",
+                        "buildEnd": "'$buildEnd'",
                         "provenanceId": "'$BUILD_URL'",
                         "logsUri": "'$BUILD_URL'consoleText",
-                        "creator": "'$creator'"
+                        "creator": "'$creator'",
                         "commitId": "'$commit'"
                     }' \
                     --header='Content-Type: application/json' \
