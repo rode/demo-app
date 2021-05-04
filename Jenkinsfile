@@ -1,6 +1,5 @@
 def tag = ""
 def image = ""
-def buildStart = ""
 pipeline {
     agent {
         kubernetes {
@@ -13,26 +12,25 @@ pipeline {
             steps {
                 container('git') {
                     script {
-                        buildStart = sh(script: "date -Iseconds", returnStdout: true).trim()
+                        sh(script: "date -Iseconds > build-start", returnStdout: true).trim()
                         tag = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                     }
                 }
                 container('kaniko') {
-                    sh "executor -c . --skip-tls-verify --digest-file image -d $HARBOR_HOST/rode-demo/rode-demo-node-app:${tag}"
+                    sh "executor -c . --skip-tls-verify --digest-file image --image-name-tag-with-digest-file test -d $HARBOR_HOST/rode-demo/rode-demo-node-app:${tag}"
                 }
                 container('git') {
                     script {
                         image=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
                     }
                     sh '''
-                    env
-                    echo '$tag'
-                    echo '$buildStart'
-
+                    buildStart=$(cat build-start)
                     buildEnd=$(date -Iseconds)
                     imagesha=$(cat image | tr -d '[:space:]')
                     commit=$(git rev-parse HEAD)
                     creator=$(git show -s --format='%ae')
+                    echo "contents --image-name-tag-with-digest-file"
+                    cat test
 
                     wget -O- \
                     --post-data='{
