@@ -12,7 +12,7 @@ pipeline {
             steps {
                 container('git') {
                     script {
-                        sh(script: "date -Iseconds > build-start", returnStdout: true).trim()
+                        sh(script: "date -u +'%Y-%m-%dT%H:%M:%SZ' > build-start", returnStdout: true).trim()
                         tag = sh(script: 'git rev-parse --short HEAD > image-tag && cat image-tag', returnStdout: true).trim()
                     }
                 }
@@ -25,7 +25,7 @@ pipeline {
                     }
                     sh '''
                     buildStart=$(cat build-start)
-                    buildEnd=$(date -Iseconds)
+                    buildEnd=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
                     imagesha=$(cat image | tr -d '[:space:]')
                     tag=$(cat image-tag)
                     commit=$(git rev-parse HEAD)
