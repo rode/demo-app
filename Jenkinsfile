@@ -17,7 +17,7 @@ pipeline {
                     }
                 }
                 container('kaniko') {
-                    sh "echo 'got the tag'$tag'' && executor -c . --skip-tls-verify --digest-file image -d $HARBOR_HOST/rode-demo/rode-demo-node-app:${tag}"
+                    sh "executor -c . --skip-tls-verify --digest-file image -d $HARBOR_HOST/rode-demo/rode-demo-node-app:${tag}"
                 }
                 container('git') {
                     script {
@@ -27,7 +27,7 @@ pipeline {
                     buildStart=$(cat build-start)
                     buildEnd=$(date -Iseconds)
                     imagesha=$(cat image | tr -d '[:space:]')
-                    tag=$(cat tag)
+                    tag=$(cat image-tag)
                     commit=$(git rev-parse HEAD)
                     creator=$(git show -s --format='%ae')
 
