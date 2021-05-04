@@ -13,11 +13,11 @@ pipeline {
                 container('git') {
                     script {
                         sh(script: "date -Iseconds > build-start", returnStdout: true).trim()
-                        tag = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                        tag = sh(script: 'git rev-parse --short HEAD > image-tag && cat image-tag', returnStdout: true).trim()
                     }
                 }
                 container('kaniko') {
-                    sh "executor -c . --skip-tls-verify --digest-file image --image-name-tag-with-digest-file test -d $HARBOR_HOST/rode-demo/rode-demo-node-app:${tag}"
+                    sh "echo 'got the tag'$tag'' && executor -c . --skip-tls-verify --digest-file image -d $HARBOR_HOST/rode-demo/rode-demo-node-app:${tag}"
                 }
                 container('git') {
                     script {
@@ -27,10 +27,9 @@ pipeline {
                     buildStart=$(cat build-start)
                     buildEnd=$(date -Iseconds)
                     imagesha=$(cat image | tr -d '[:space:]')
+                    tag=$(cat tag)
                     commit=$(git rev-parse HEAD)
                     creator=$(git show -s --format='%ae')
-                    echo "contents --image-name-tag-with-digest-file"
-                    cat test
 
                     wget -O- \
                     --post-data='{
@@ -39,7 +38,7 @@ pipeline {
                             {
                                 "id": "'$HARBOR_HOST'/rode-demo/rode-demo-node-app@'$imagesha'",
                                 "names": [
-                                    "'$HARBOR_HOST'/rode-demo/rode-demo-node-app:'${tag}'"
+                                    "'$HARBOR_HOST'/rode-demo/rode-demo-node-app:'$tag'"
                                 ]
                             }
                         ],
