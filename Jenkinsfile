@@ -1,5 +1,6 @@
 def tag = ""
 def image = ""
+def buildStart = ""
 pipeline {
     agent {
         kubernetes {
@@ -12,6 +13,7 @@ pipeline {
             steps {
                 container('git') {
                     script {
+                        buildStart = sh(script: "date -Iseconds", returnStdout: true).trim()
                         tag = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                     }
                 }
@@ -23,20 +25,27 @@ pipeline {
                         image=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
                     }
                     sh '''
-                    env
-
+                    buildEnd=$(date -Iseconds)
                     imagesha=$(cat image | tr -d '[:space:]')
                     commit=$(git rev-parse HEAD)
+                    creator=$(git show -s --format='%ae')
+
                     wget -O- \
                     --post-data='{
                         "repository": "https://github.com/rode/demo-app",
                         "artifacts": [
                             {
-                                "id": "'$HARBOR_HOST'/rode-demo/rode-demo-node-app@'$imagesha'"
+                                "id": "'$HARBOR_HOST'/rode-demo/rode-demo-node-app@'$imagesha'",
+                                "names": [
+                                    "'$HARBOR_HOST'/rode-demo/rode-demo-node-app:'${tag}'"
+                                ]
                             }
                         ],
+                        "buildStart": "'$buildStart'"
+                        "buildEnd": "'$buildEnd'"
                         "provenanceId": "'$BUILD_URL'",
-                        "logsUri": "'$BUILD_URL'/consoleText",
+                        "logsUri": "'$BUILD_URL'consoleText",
+                        "creator": "'$creator'"
                         "commitId": "'$commit'"
                     }' \
                     --header='Content-Type: application/json' \
