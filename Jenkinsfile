@@ -33,7 +33,7 @@ pipeline {
 
                     wget -O- \
                     --post-data='{
-                        "repository": "https://github.com/rode/demo-app/commit/'$commit'",
+                        "repository": "https://github.com/rode/demo-app",
                         "artifacts": [
                             {
                                 "id": "'$HARBOR_HOST'/rode-demo/rode-demo-node-app@'$imagesha'",
