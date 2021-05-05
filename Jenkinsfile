@@ -30,10 +30,11 @@ pipeline {
                     tag=$(cat image-tag)
                     commit=$(git rev-parse HEAD)
                     creator=$(git show -s --format='%ae')
+                    repository="https://github.com/rode/demo-app"
 
                     wget -O- \
                     --post-data='{
-                        "repository": "https://github.com/rode/demo-app",
+                        "repository": "'$repository'",
                         "artifacts": [
                             {
                                 "id": "'$HARBOR_HOST'/rode-demo/rode-demo-node-app@'$imagesha'",
@@ -47,7 +48,8 @@ pipeline {
                         "provenanceId": "'$BUILD_URL'",
                         "logsUri": "'$BUILD_URL'consoleText",
                         "creator": "'$creator'",
-                        "commitId": "'$commit'"
+                        "commitId": "'$commit'",
+                        "commitUri": "'$repository'/commit/'$commit'"
                     }' \
                     --header='Content-Type: application/json' \
                     'http://rode-collector-build.'"$RODE_NAMESPACE"'.svc.cluster.local:8082/v1alpha1/builds'
