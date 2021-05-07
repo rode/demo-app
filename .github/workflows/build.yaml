@@ -1,0 +1,91 @@
+name: Build & Deploy demo-app
+
+on:
+  push:
+
+env:
+  BUILD_COLLECTOR_HOST: 'rode-collector-build.rode-demo.svc.cluster.local:8082'
+  HARBOR_HOST: 'harbor.internal.lead.prod.liatr.io'
+  IMAGE: 'rode-demo/rode-demo-node-app'
+  DEPLOY_REPO: 'rode/demo-app-deployment'
+
+jobs:
+  build:
+    runs-on:
+      - self-hosted
+      - rode-runners-prod
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Create Docker Tag
+        id: tag
+        run: |
+          echo "::set-output name=tag::$(git rev-parse --short HEAD)"
+
+      - name: Login to Harbor
+        uses: docker/login-action@v1.9.0
+        with:
+          registry: ${{ env.HARBOR_HOST }}
+          username: ${{ secrets.HARBOR_USERNAME }}
+          password: ${{ secrets.HARBOR_PASSWORD }}
+
+      - name: Build and Push
+        id: build
+        run: |
+          cp $HOME/.docker/config.json config.json
+          trap "rm config.json" EXIT
+
+          docker run \
+            -v $(pwd):/workspace \
+            -v $(pwd)/config.json:/kaniko/.docker/config.json:ro \
+            gcr.io/kaniko-project/executor:v1.6.0 \
+              --context dir:///workspace/ \
+              --skip-tls-verify \
+              --digest-file image \
+              -d ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
+
+          echo "::set-output name=digest::$(cat image)"
+
+      - name: Create Build Occurrence
+        uses: rode/create-build-occurrence-action@v0.1.1
+        id: rode
+        with:
+          artifactId: ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}@${{ steps.build.outputs.digest }}
+          artifactNames: |
+            ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
+          buildCollectorHost: ${{ env.BUILD_COLLECTOR_HOST }}
+          buildCollectorInsecure: true
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on:
+      - self-hosted
+      - rode-runners-prod
+    needs:
+      - build
+    steps:
+      - name: Checkout Deploy Repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          repository: ${{ env.DEPLOY_REPO }}
+
+      - name: Get Image Digest
+        id: digest
+        run: |
+          hash=$(echo ${{ needs.build.outputs.digest }} | sed 's/sha256://g')
+          echo "::set-output name=hash::$hash"
+
+      - name: Update Manifest
+        uses: liatrio/github-actions/gitops-gh-pr-yaml@gitops-gh-pr
+        with:
+          repo: ${{ env.DEPLOY_REPO }}
+          token: ${{ secrets.GITOPS_TOKEN }}
+          file: env-values.yaml
+          path: image.tag
+          value: ${{ steps.digest.outputs.hash }}
