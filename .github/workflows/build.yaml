@@ -82,10 +82,15 @@ jobs:
           echo "::set-output name=hash::$hash"
 
       - name: Update Manifest
-        uses: liatrio/github-actions/gitops-gh-pr-yaml@gitops-gh-pr
+        uses: liatrio/github-actions/gitops-update-yaml@master
         with:
-          repo: ${{ env.DEPLOY_REPO }}
-          token: ${{ secrets.GITOPS_TOKEN }}
           file: env-values.yaml
           path: image.tag
           value: ${{ steps.digest.outputs.hash }}
+
+      - name: Create pull request
+        uses: liatrio/github-actions/gitops-gh-pr@master
+        with:
+          repo: ${{ env.DEPLOY_REPO }}
+          token: ${{ secrets.GITOPS_TOKEN }}
+          message: "update image hash to ${{ steps.digest.outputs.hash }}"
