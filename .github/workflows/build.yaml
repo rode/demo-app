@@ -82,7 +82,7 @@ jobs:
           echo "::set-output name=hash::$hash"
 
       - name: Update Manifest
-        uses: liatrio/github-actions/gitops-gh-pr-yaml@gitops-gh-pr
+        uses: liatrio/github-actions/gitops-gh-pr-yaml@caf1e51de7f5f9135def3d0c50076c37e33cbb1d
         with:
           repo: ${{ env.DEPLOY_REPO }}
           token: ${{ secrets.GITOPS_TOKEN }}
