@@ -86,7 +86,7 @@ jobs:
         uses: liatrio/github-actions/gitops-update-yaml@master
         with:
           file: env-values.yaml
-          path: image.tag
+          path: .image.tag
           value: ${{ steps.digest.outputs.hash }}
 
       - name: Trigger dev deployment
