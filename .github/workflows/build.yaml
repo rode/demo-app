@@ -8,6 +8,7 @@ env:
   HARBOR_HOST: 'harbor.internal.lead.prod.liatr.io'
   IMAGE: 'rode-demo/rode-demo-node-app'
   DEPLOY_REPO: 'rode/demo-app-deployment'
+  DEPLOY_REPO_BRANCH: 'dev'
 
 jobs:
   build:
@@ -88,9 +89,12 @@ jobs:
           path: image.tag
           value: ${{ steps.digest.outputs.hash }}
 
-      - name: Create pull request
-        uses: liatrio/github-actions/gitops-gh-pr@master
-        with:
-          repo: ${{ env.DEPLOY_REPO }}
-          token: ${{ secrets.GITOPS_TOKEN }}
-          message: "update image hash to ${{ steps.digest.outputs.hash }}"
+      - name: Trigger dev deployment
+        run: |
+          echo "https://gitops:${{ secrets.GITOPS_TOKEN }}@github.com" > ~/.git-credentials
+          git config --local credential.helper store
+          git config --local user.email "gitops@liatr.io"
+          git config --local user.name "GitOps Automation"
+
+          git commit -am "Deployment to ${{ env.DEPLOY_REPO_BRANCH }} from CI - ${{ steps.digest.outputs.hash }}"
+          git push origin ${{ env.DEPLOY_REPO_BRANCH }}
