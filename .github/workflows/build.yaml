@@ -62,7 +62,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
-#    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on:
       - self-hosted
       - rode-runners-prod
