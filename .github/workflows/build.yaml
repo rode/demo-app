@@ -8,7 +8,7 @@ env:
   HARBOR_HOST: 'harbor.internal.lead.prod.liatr.io'
   IMAGE: 'rode-demo/rode-demo-node-app'
   DEPLOY_REPO: 'rode/demo-app-deployment'
-  DEPLOY_REPO_BRANCH: 'test'
+  DEPLOY_REPO_BRANCH: 'dev'
 
 jobs:
   build:
