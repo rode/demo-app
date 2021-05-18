@@ -8,7 +8,7 @@ env:
   HARBOR_HOST: 'harbor.internal.lead.prod.liatr.io'
   IMAGE: 'rode-demo/rode-demo-node-app'
   DEPLOY_REPO: 'rode/demo-app-deployment'
-  DEPLOY_REPO_BRANCH: 'dev'
+  DEPLOY_REPO_BRANCH: 'test'
 
 jobs:
   build:
@@ -62,7 +62,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
-    if: ${{ github.ref == 'refs/heads/main' }}
+#    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on:
       - self-hosted
       - rode-runners-prod
