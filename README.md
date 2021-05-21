@@ -1,4 +1,4 @@
-# demo-app
+# Demo Application and CI Pipeline for Rode
 This is the application repository used to demo Rode capabilities.
 - The application used in the demo is a simple Express/Node app serving a `Hello World` response. [server.js](server.js)
 - We build this application Docker image via Kaniko from self-hosted Kubernetes GitHub Action runners.
@@ -7,5 +7,5 @@ This is the application repository used to demo Rode capabilities.
   - This stage is executed via our GitOps GitHub Action by making a commit to the [demo-app-deployment]([https://](https://github.com/rode/demo-app-deployment)) repository.
   - The `dev` branch is updated in the destination repository, triggering a deployment via Helm to the respective `dev` environment Kubernetes namespace.
 
-## Demo App Build and Deployment Workflow
+## Example Build and Deployment Workflow with Rode
 ![Demo App Workflow](resources/rode-demo-pipeline.png)
