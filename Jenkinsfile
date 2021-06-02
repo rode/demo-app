@@ -13,7 +13,7 @@ pipeline {
                 container('sonarqube') {
                     script {
                         withSonarQubeEnv('SonarQube') {
-                            println ${env.SONAR_HOST_URL}
+                            println $SONAR_HOST_URL
                         }
                     }
                 }
