@@ -11,10 +11,8 @@ pipeline {
         stage('Scan') {
             steps {
                 container('sonarqube') {
-                    script {
-                        withSonarQubeEnv('SonarQube') {
-                            println $SONAR_HOST_URL
-                        }
+                    withSonarQubeEnv('SonarQube') {
+                        sh 'echo $SONAR_HOST_URL'
                     }
                 }
             }
