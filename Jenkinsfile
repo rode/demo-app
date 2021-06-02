@@ -12,7 +12,7 @@ pipeline {
             steps {
                 container('sonarqube') {
                     withSonarQubeEnv('SonarQube') {
-                        sh 'echo $SONAR_HOST_URL'
+                        sh '/usr/bin/entrypoint.sh -Dsonar.projectKey="rode:demo-app" -Dsonar.analysis.resourceUriPrefix=github.com/rode/demo-app'
                     }
                 }
             }
