@@ -8,6 +8,17 @@ pipeline {
     }
 
     stages {
+        stage('Scan') {
+            steps {
+                container('sonarqube') {
+                    script {
+                        withSonarQubeEnv('SonarQube') {
+                            println ${env.SONAR_HOST_URL}
+                        }
+                    }
+                }
+            }
+        }
         stage('Build') {
             steps {
                 container('git') {

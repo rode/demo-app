@@ -22,6 +22,11 @@ spec:
       command: 
         - cat
       tty: true
+    - name: sonarqube
+      image: sonarsource/sonar-scanner-cli
+      command:
+        - cat
+      tty: true
       
       
   volumes:
