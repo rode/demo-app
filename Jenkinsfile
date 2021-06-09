@@ -8,6 +8,15 @@ pipeline {
     }
 
     stages {
+        stage('Scan') {
+            steps {
+                container('sonarqube') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh '/usr/bin/entrypoint.sh -Dsonar.projectKey="rode:demo-app" -Dsonar.analysis.resourceUriPrefix=github.com/rode/demo-app'
+                    }
+                }
+            }
+        }
         stage('Build') {
             steps {
                 container('git') {
