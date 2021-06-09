@@ -22,7 +22,7 @@ pipeline {
                 container('git') {
                     script {
                         sh(script: "date -u +'%Y-%m-%dT%H:%M:%SZ' > build-start", returnStdout: true).trim()
-                        tag = sh(script: 'git rev-parse --short HEAD > image-tag && cat image-tag', returnStdout: true).trim()
+                        tag = sh(script: 'git rev-parse --short HEAD > image-tag && echo "$GIT_BRANCH-`cat image-tag`"', returnStdout: true).trim()
                     }
                 }
                 container('kaniko') {
