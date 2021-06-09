@@ -6,7 +6,6 @@ const PORT = 8081;
 const HOST = '0.0.0.0';
 
 const app = express();
-app.disable("x-powered-by");
 
 app.get('/', (req, res) => {
     res.send('Hello World');
