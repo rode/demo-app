@@ -28,8 +28,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ env.SONARQUBE_HOST }}
-        run: |
-          /usr/bin/entrypoint.sh -Dsonar.projectKey="rode:demo-app" -Dsonar.analysis.resourceUriPrefix=github.com/rode/demo-app
 
       - name: Create Docker Tag
         id: tag
