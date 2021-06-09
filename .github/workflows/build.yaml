@@ -24,7 +24,7 @@ jobs:
       - name: Create Docker Tag
         id: tag
         run: |
-          echo "::set-output name=tag::$(git rev-parse --short HEAD)"
+          echo "::set-output name=tag::$(echo ${GITHUB_REF#refs/heads/})-$(git rev-parse --short HEAD)"
 
       - name: Login to Harbor
         uses: docker/login-action@v1.9.0
