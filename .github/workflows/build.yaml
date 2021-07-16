@@ -22,86 +22,96 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: SonarQube Scan
-        uses: docker://sonarsource/sonar-scanner-cli:latest
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ env.SONAR_HOST }}
-
-      - name: Create Docker Tag
-        id: tag
-        run: |
-          echo "::set-output name=tag::$(echo ${GITHUB_REF#refs/heads/})-$(git rev-parse --short HEAD)"
-
-      - name: Login to Harbor
-        uses: docker/login-action@v1.9.0
+      - name: Fetch Access Token
+        uses: liatrio/github-actions/oauth2-token@oauth2-token
+        id: token
         with:
-          registry: ${{ env.HARBOR_HOST }}
-          username: ${{ secrets.HARBOR_USERNAME }}
-          password: ${{ secrets.HARBOR_PASSWORD }}
-
-      - name: Build and Push
-        id: build
+          clientId: test
+          clientSecret: ${{ secrets.CLIENT_SECRET }}
+          tokenUrl: https://aha-keycloak.ngrok.io/auth/realms/test/protocol/openid-connect/token
+      - name: Test Access
         run: |
-          cp $HOME/.docker/config.json config.json
-          trap "rm config.json" EXIT
+          curl -H "Authorization: Bearer ${{ steps.token.outputs.accessToken }}" https://aha-echo.ngrok.io
+#      - name: SonarQube Scan
+#        uses: docker://sonarsource/sonar-scanner-cli:latest
+#        env:
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#          SONAR_HOST_URL: ${{ env.SONAR_HOST }}
+#
+#      - name: Create Docker Tag
+#        id: tag
+#        run: |
+#          echo "::set-output name=tag::$(echo ${GITHUB_REF#refs/heads/})-$(git rev-parse --short HEAD)"
+#
+#      - name: Login to Harbor
+#        uses: docker/login-action@v1.9.0
+#        with:
+#          registry: ${{ env.HARBOR_HOST }}
+#          username: ${{ secrets.HARBOR_USERNAME }}
+#          password: ${{ secrets.HARBOR_PASSWORD }}
+#
+#      - name: Build and Push
+#        id: build
+#        run: |
+#          cp $HOME/.docker/config.json config.json
+#          trap "rm config.json" EXIT
+#
+#          docker run \
+#            -v $(pwd):/workspace \
+#            -v $(pwd)/config.json:/kaniko/.docker/config.json:ro \
+#            gcr.io/kaniko-project/executor:v1.6.0 \
+#              --context dir:///workspace/ \
+#              --skip-tls-verify \
+#              --digest-file image \
+#              -d ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
+#
+#          echo "::set-output name=digest::$(cat image)"
+#
+#      - name: Create Build Occurrence
+#        uses: rode/create-build-occurrence-action@v0.1.1
+#        id: rode
+#        with:
+#          artifactId: ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}@${{ steps.build.outputs.digest }}
+#          artifactNames: |
+#            ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
+#          buildCollectorHost: ${{ env.BUILD_COLLECTOR_HOST }}
+#          buildCollectorInsecure: true
+#          githubToken: ${{ secrets.GITHUB_TOKEN }}
 
-          docker run \
-            -v $(pwd):/workspace \
-            -v $(pwd)/config.json:/kaniko/.docker/config.json:ro \
-            gcr.io/kaniko-project/executor:v1.6.0 \
-              --context dir:///workspace/ \
-              --skip-tls-verify \
-              --digest-file image \
-              -d ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
-
-          echo "::set-output name=digest::$(cat image)"
-
-      - name: Create Build Occurrence
-        uses: rode/create-build-occurrence-action@v0.1.1
-        id: rode
-        with:
-          artifactId: ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}@${{ steps.build.outputs.digest }}
-          artifactNames: |
-            ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
-          buildCollectorHost: ${{ env.BUILD_COLLECTOR_HOST }}
-          buildCollectorInsecure: true
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-
-  deploy:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    runs-on:
-      - self-hosted
-      - rode-runners-prod
-    needs:
-      - build
-    steps:
-      - name: Checkout Deploy Repo
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-          repository: ${{ env.DEPLOY_REPO }}
-
-      - name: Get Image Digest
-        id: digest
-        run: |
-          hash=$(echo ${{ needs.build.outputs.digest }} | sed 's/sha256://g')
-          echo "::set-output name=hash::$hash"
-
-      - name: Update Manifest
-        uses: liatrio/github-actions/gitops-update-yaml@master
-        with:
-          file: env-values.yaml
-          path: .image.tag
-          value: ${{ steps.digest.outputs.hash }}
-
-      - name: Trigger dev deployment
-        run: |
-          echo "https://gitops:${{ secrets.GITOPS_TOKEN }}@github.com" > ~/.git-credentials
-          git config --local credential.helper store
-          git config --local user.email "gitops@liatr.io"
-          git config --local user.name "GitOps Automation"
-
-          git commit -am "Deployment to ${{ env.DEPLOY_REPO_BRANCH }} from CI - ${{ steps.digest.outputs.hash }}"
-          git push origin ${{ env.DEPLOY_REPO_BRANCH }}
+#  deploy:
+#    if: ${{ github.ref == 'refs/heads/main' }}
+#    runs-on:
+#      - self-hosted
+#      - rode-runners-prod
+#    needs:
+#      - build
+#    steps:
+#      - name: Checkout Deploy Repo
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#          persist-credentials: false
+#          repository: ${{ env.DEPLOY_REPO }}
+#
+#      - name: Get Image Digest
+#        id: digest
+#        run: |
+#          hash=$(echo ${{ needs.build.outputs.digest }} | sed 's/sha256://g')
+#          echo "::set-output name=hash::$hash"
+#
+#      - name: Update Manifest
+#        uses: liatrio/github-actions/gitops-update-yaml@master
+#        with:
+#          file: env-values.yaml
+#          path: .image.tag
+#          value: ${{ steps.digest.outputs.hash }}
+#
+#      - name: Trigger dev deployment
+#        run: |
+#          echo "https://gitops:${{ secrets.GITOPS_TOKEN }}@github.com" > ~/.git-credentials
+#          git config --local credential.helper store
+#          git config --local user.email "gitops@liatr.io"
+#          git config --local user.name "GitOps Automation"
+#
+#          git commit -am "Deployment to ${{ env.DEPLOY_REPO_BRANCH }} from CI - ${{ steps.digest.outputs.hash }}"
+#          git push origin ${{ env.DEPLOY_REPO_BRANCH }}
