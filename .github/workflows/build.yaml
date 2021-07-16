@@ -26,10 +26,9 @@ jobs:
         uses: liatrio/github-actions/oauth2-token@oauth2-token
         id: token
         with:
-          clientId: test
+          clientId: test2
           clientSecret: ${{ secrets.CLIENT_SECRET }}
           tokenUrl: https://aha-keycloak.ngrok.io/auth/realms/test/protocol/openid-connect/token
-          scopes: api://9A982BAB-FB6B-494F-9D94-33D6CD6E113C/.default
       - name: Test Access
         run: |
           curl -H "Authorization: Bearer ${{ steps.token.outputs.accessToken }}" https://aha-echo.ngrok.io
