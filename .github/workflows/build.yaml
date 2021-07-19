@@ -68,7 +68,7 @@ jobs:
           tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
 
       - name: Create Build Occurrence
-        uses: rode/create-build-occurrence-action@auth
+        uses: rode/create-build-occurrence-action@v0.2.0
         id: rode
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}
