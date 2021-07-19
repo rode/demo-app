@@ -5,7 +5,7 @@ on:
 
 env:
 #  BUILD_COLLECTOR_HOST: 'rode-collector-build.rode-demo.svc.cluster.local:8082'
-  BUILD_COLLECTOR_HOST: '0.tcp.ngrok.io:15977'
+  BUILD_COLLECTOR_HOST: '6.tcp.ngrok.io:14958'
   HARBOR_HOST: 'harbor.internal.lead.prod.liatr.io'
   SONAR_HOST: 'https://sonarqube.internal.lead.prod.liatr.io'
   IMAGE: 'rode-demo/rode-demo-node-app'
