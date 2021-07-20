@@ -1,6 +1,7 @@
 name: Build & Deploy demo-app
 
 on:
+  workflow_dispatch:
   push:
 
 env:
