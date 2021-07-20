@@ -2,6 +2,11 @@ name: Build & Deploy demo-app
 
 on:
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Update Deploy Repo Manifest'     
+        required: true
+        default: 'false'
   push:
 
 env:
@@ -70,7 +75,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true' }}
     runs-on:
       - self-hosted
       - rode-runners-prod
