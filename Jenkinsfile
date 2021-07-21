@@ -1,5 +1,6 @@
 def tag = ""
 def image = ""
+def accessToken = ""
 pipeline {
     agent {
         kubernetes {
@@ -28,6 +29,11 @@ pipeline {
                 container('kaniko') {
                     sh "executor -c . --skip-tls-verify --digest-file image -d $HARBOR_HOST/rode-demo/rode-demo-node-app:${tag}"
                 }
+                container('curl-jq') {
+                    script {
+                        accessToken = sh(script: "./get-access-token.sh > access-token && cat access-token", returnStdout: true).trim()
+                    }
+                }
                 container('git') {
                     script {
                         image=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
@@ -37,12 +43,18 @@ pipeline {
                     buildEnd=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
                     imagesha=$(cat image | tr -d '[:space:]')
                     tag=$(cat image-tag)
+                    accessToken=$(cat access-token | tr -d '[:space:]' | tr -d '\n')
                     commit=$(git rev-parse HEAD)
                     creator=$(git show -s --format='%ae')
                     repository="https://github.com/rode/demo-app"
 
-                    wget -O- \
-                    --post-data='{
+                    echo "Content-Type: application/json" > headers
+
+                    if [ -n "${accessToken}" ]; then
+                      echo "Authorization: bearer ${accessToken}" >> headers
+                    fi
+
+                    payload='{
                         "repository": "'$repository'",
                         "artifacts": [
                             {
@@ -59,9 +71,12 @@ pipeline {
                         "creator": "'$creator'",
                         "commitId": "'$commit'",
                         "commitUri": "'$repository'/commit/'$commit'"
-                    }' \
-                    --header='Content-Type: application/json' \
-                    'http://rode-collector-build.'"$RODE_NAMESPACE"'.svc.cluster.local:8082/v1alpha1/builds'
+                    }'
+
+                    curl \
+                      -d "${payload}" \
+                      -H @headers \
+                      "http://rode-collector-build.${RODE_NAMESPACE}.svc.cluster.local:8082/v1alpha1/builds"
                     '''
                 }
             }
