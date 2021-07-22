@@ -27,8 +27,8 @@ spec:
       command:
         - cat
       tty: true
-    - name: curl-jq
-      image: peterevans/curl-jq
+    - name: curl
+      image: curlimages/curl
       command:
         - cat
       tty: true
