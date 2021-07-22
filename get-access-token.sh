@@ -2,7 +2,7 @@
 
 set -e
 
-tokenUrl=$(cat /usr/oidc/credentials.json | jq -r '.tokenUrl')
+tokenUrl=$(jq -r '.tokenUrl' < /usr/oidc/credentials.json)
 if [ -z "${tokenUrl}" ]; then
   exit 0
 fi

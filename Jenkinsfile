@@ -1,6 +1,5 @@
 def tag = ""
 def image = ""
-def accessToken = ""
 pipeline {
     agent {
         kubernetes {
@@ -31,7 +30,7 @@ pipeline {
                 }
                 container('curl-jq') {
                     script {
-                        accessToken = sh(script: "./get-access-token.sh > access-token && cat access-token", returnStdout: true).trim()
+                        sh "./get-access-token.sh > access-token"
                     }
                 }
                 container('git') {
@@ -51,7 +50,7 @@ pipeline {
                     echo "Content-Type: application/json" > headers
 
                     if [ -n "${accessToken}" ]; then
-                      echo "Authorization: bearer ${accessToken}" >> headers
+                      echo "Authorization: Bearer ${accessToken}" >> headers
                     fi
 
                     payload='{
