@@ -42,7 +42,6 @@ pipeline {
                     buildEnd=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
                     imagesha=$(cat image | tr -d '[:space:]')
                     tag=$(cat image-tag)
-                    accessToken=$(cat access-token | tr -d '[:space:]' | tr -d '\n')
                     commit=$(git rev-parse HEAD)
                     creator=$(git show -s --format='%ae')
                     repository="https://github.com/rode/demo-app"
@@ -70,6 +69,7 @@ pipeline {
 
                     set +x
 
+                    accessToken=$(cat access-token | tr -d '[:space:]' | tr -d '\n')
                     if [ -n "${accessToken}" ]; then
                       echo "Authorization: Bearer ${accessToken}" >> headers
                     fi
