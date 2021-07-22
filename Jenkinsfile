@@ -71,6 +71,7 @@ pipeline {
                     set +x
 
                     accessToken=$(cat access-token | tr -d '[:space:]' | tr -d '\n')
+                    echo $accessToken
                     if [ -n "${accessToken}" ]; then
                       echo "Authorization: Bearer ${accessToken}" >> headers
                     fi
