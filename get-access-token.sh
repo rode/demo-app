@@ -7,10 +7,10 @@ if [ -z "${tokenUrl}" ]; then
   exit 0
 fi
 
-clientId=$(cat /usr/oidc/credentials.json | jq -r '.clientId')
-clientSecret=$(cat /usr/oidc/credentials.json | jq -r '.clientSecret')
+clientId=$(jq -r '.clientId' < /usr/oidc/credentials.json)
+clientSecret=$(jq -r '.clientSecret' < /usr/oidc/credentials.json)
 
-response=$(curl --user ${clientId}:${clientSecret} -d "grant_type=client_credentials" ${tokenUrl})
+response=$(curl --user ${clientId}:${clientSecret} -k -d "grant_type=client_credentials" ${tokenUrl})
 
 if [ "$(echo "$response" | jq 'has("error")')" == 'true' ]; then
   echo "Error retrieving token: ${response}"
