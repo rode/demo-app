@@ -5,7 +5,7 @@ spec:
   serviceAccountName: jenkins-agent
   containers:
     - name: git
-      image: bitnami/git
+      image: alpine/git
       command:
         - cat
       tty: true
