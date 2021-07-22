@@ -27,8 +27,8 @@ spec:
       command:
         - cat
       tty: true
-    - name: curl
-      image: curlimages/curl
+    - name: alpine
+      image: alpine
       command:
         - cat
       tty: true

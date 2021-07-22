@@ -2,7 +2,7 @@
 
 set -e
 
-apk add --no-cache jq
+apk add --no-cache jq curl
 
 tokenUrl=$(jq -r '.tokenUrl' < /usr/oidc/credentials.json)
 if [ -z "${tokenUrl}" ]; then

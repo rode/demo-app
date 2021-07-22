@@ -28,7 +28,7 @@ pipeline {
                 container('kaniko') {
                     sh "executor -c . --skip-tls-verify --digest-file image -d $HARBOR_HOST/rode-demo/rode-demo-node-app:${tag}"
                 }
-                container('curl') {
+                container('alpine') {
                     script {
                         sh "./get-access-token.sh > access-token"
                     }
