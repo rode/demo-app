@@ -38,7 +38,6 @@ pipeline {
                         image=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
                     }
                     sh '''
-                    set +x
                     buildStart=$(cat build-start)
                     buildEnd=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
                     imagesha=$(cat image | tr -d '[:space:]')
@@ -47,12 +46,6 @@ pipeline {
                     commit=$(git rev-parse HEAD)
                     creator=$(git show -s --format='%ae')
                     repository="https://github.com/rode/demo-app"
-
-                    echo "Content-Type: application/json" > headers
-
-                    if [ -n "${accessToken}" ]; then
-                      echo "Authorization: Bearer ${accessToken}" >> headers
-                    fi
 
                     payload='{
                         "repository": "'$repository'",
@@ -72,6 +65,14 @@ pipeline {
                         "commitId": "'$commit'",
                         "commitUri": "'$repository'/commit/'$commit'"
                     }'
+
+                    echo "Content-Type: application/json" > headers
+
+                    set +x
+
+                    if [ -n "${accessToken}" ]; then
+                      echo "Authorization: Bearer ${accessToken}" >> headers
+                    fi
 
                     curl \
                       -d "${payload}" \
