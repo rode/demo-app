@@ -28,11 +28,17 @@ pipeline {
                 container('kaniko') {
                     sh "executor -c . --skip-tls-verify --digest-file image -d $HARBOR_HOST/rode-demo/rode-demo-node-app:${tag}"
                 }
+                container('alpine') {
+                    script {
+                        sh "./get-access-token.sh > access-token"
+                    }
+                }
                 container('git') {
                     script {
                         image=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
                     }
                     sh '''
+                    apk add --no-cache curl
                     buildStart=$(cat build-start)
                     buildEnd=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
                     imagesha=$(cat image | tr -d '[:space:]')
@@ -41,8 +47,7 @@ pipeline {
                     creator=$(git show -s --format='%ae')
                     repository="https://github.com/rode/demo-app"
 
-                    wget -O- \
-                    --post-data='{
+                    payload='{
                         "repository": "'$repository'",
                         "artifacts": [
                             {
@@ -59,9 +64,21 @@ pipeline {
                         "creator": "'$creator'",
                         "commitId": "'$commit'",
                         "commitUri": "'$repository'/commit/'$commit'"
-                    }' \
-                    --header='Content-Type: application/json' \
-                    'http://rode-collector-build.'"$RODE_NAMESPACE"'.svc.cluster.local:8082/v1alpha1/builds'
+                    }'
+
+                    echo "Content-Type: application/json" > headers
+
+                    set +x
+
+                    accessToken=$(cat access-token | tr -d '[:space:]' | tr -d '\n')
+                    if [ -n "${accessToken}" ]; then
+                      echo "Authorization: Bearer ${accessToken}" >> headers
+                    fi
+
+                    curl \
+                      -d "${payload}" \
+                      -H @headers \
+                      "http://rode-collector-build.${RODE_NAMESPACE}.svc.cluster.local:8082/v1alpha1/builds"
                     '''
                 }
             }

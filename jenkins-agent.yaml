@@ -27,9 +27,21 @@ spec:
       command:
         - cat
       tty: true
+    - name: alpine
+      image: alpine
+      command:
+        - cat
+      tty: true
+      volumeMounts:
+        - name: oidc-credentials
+          mountPath: "/usr/oidc"
+
       
       
   volumes:
     - name: docker-config
       secret:
         secretName: "jenkins-docker-config"
+    - name: oidc-credentials
+      secret:
+        secretName: "jenkins-oidc-credentials"
