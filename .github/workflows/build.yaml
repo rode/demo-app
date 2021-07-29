@@ -64,7 +64,7 @@ jobs:
         id: token
         with:
           clientId: ${{ env.OAUTH2_CLIENT_ID }}
-          clientSecret: ${{ secrets.CLIENT_SECRET }}
+          clientSecret: ${{ secrets.OAUTH2_CLIENT_SECRET }}
           tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
 
       - name: Create Build Occurrence
