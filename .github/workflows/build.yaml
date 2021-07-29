@@ -16,6 +16,8 @@ env:
   IMAGE: 'rode-demo/rode-demo-node-app'
   DEPLOY_REPO: 'rode/demo-app-deployment'
   DEPLOY_REPO_BRANCH: 'dev'
+  OAUTH2_TOKEN_URL: 'https://keycloak.internal.lead.prod.liatr.io/auth/realms/rode-demo/protocol/openid-connect/token'
+  OAUTH2_CLIENT_ID: rode-collector
 
 jobs:
   build:
@@ -63,10 +65,19 @@ jobs:
 
           echo "::set-output name=digest::$(cat image)"
 
+      - name: Fetch Access Token
+        uses: liatrio/github-actions/oauth2-token@master
+        id: token
+        with:
+          clientId: ${{ env.OAUTH2_CLIENT_ID }}
+          clientSecret: ${{ secrets.OAUTH2_CLIENT_SECRET }}
+          tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
+
       - name: Create Build Occurrence
-        uses: rode/create-build-occurrence-action@v0.1.1
+        uses: rode/create-build-occurrence-action@v0.2.0
         id: rode
         with:
+          accessToken: ${{ steps.token.outputs.accessToken }}
           artifactId: ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}@${{ steps.build.outputs.digest }}
           artifactNames: |
             ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
