@@ -71,6 +71,7 @@ jobs:
         uses: rode/create-build-occurrence-action@v0.2.0
         id: rode
         with:
+          accessToken: ${{ steps.token.outputs.accessToken }}
           artifactId: ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}@${{ steps.build.outputs.digest }}
           artifactNames: |
             ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
