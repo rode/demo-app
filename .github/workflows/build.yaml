@@ -16,14 +16,14 @@ env:
   IMAGE: 'liatrio/rode-demo-node-app'
   DEPLOY_REPO: 'rode/demo-app-deployment'
   DEPLOY_REPO_BRANCH: 'dev'
-  OAUTH2_TOKEN_URL: 'https://keycloak.services.liatr.io/auth/realms/rode-demo/protocol/openid-connect/token'
+  OAUTH2_TOKEN_URL: 'https://keycloak.services.liatr.io/auth/realms/liatrio/protocol/openid-connect/token'
   OAUTH2_CLIENT_ID: rode-collector
 
 jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      digest: ${{ steps.build.outputs.digest }}
+      digest: ${{ steps.image.outputs.digest }}
     environment: liatrio-sharedsvc
     steps:
       - name: Checkout Code
@@ -56,6 +56,15 @@ jobs:
           tags: |
             ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
 
+      - name: Determine Repo Digest
+        id: image
+        run: |
+          set -eu
+          imageDigest=$(docker inspect --format='{{index .RepoDigests 0}}' \
+              ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }})
+
+          echo "::set-output name=digest::${imageDigest}"
+
       - name: Fetch Access Token
         uses: liatrio/github-actions/oauth2-token@master
         id: token
@@ -69,7 +78,7 @@ jobs:
         id: rode
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}
-          artifactId: ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}@${{ steps.docker.outputs.digest }}
+          artifactId: ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}@${{ steps.image.outputs.digest }}
           artifactNames: |
             ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
           buildCollectorHost: ${{ env.BUILD_COLLECTOR_HOST }}
