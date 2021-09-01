@@ -23,7 +23,7 @@ jobs:
   build:
     runs-on:
       - self-hosted
-      - rode-runners-prod
+      - liatrio-runners-sharedsvc
     outputs:
       digest: ${{ steps.build.outputs.digest }}
     steps:
@@ -89,7 +89,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true' }}
     runs-on:
       - self-hosted
-      - rode-runners-prod
+      - liatrio-runners-sharedsvc
     needs:
       - build
     steps:
