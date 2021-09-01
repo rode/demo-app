@@ -60,9 +60,10 @@ jobs:
         id: image
         run: |
           set -eu
-          imageDigest=$(docker inspect --format='{{index .RepoDigests 0}}' \
-              ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }})
+          image=${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
+          imageDigest=$(docker inspect --format='{{index .RepoDigests 0}}' $image | cut -d'@' -f2)
 
+          echo "Image $image has repo digest $imageDigest"
           echo "::set-output name=digest::${imageDigest}"
 
       - name: Fetch Access Token
