@@ -10,13 +10,13 @@ on:
   push:
 
 env:
-  BUILD_COLLECTOR_HOST: 'rode-collector-build.rode-demo.svc.cluster.local:8082'
-  HARBOR_HOST: 'harbor.internal.lead.prod.liatr.io'
-  SONAR_HOST: 'https://sonarqube.internal.lead.prod.liatr.io'
-  IMAGE: 'rode-demo/rode-demo-node-app'
+  BUILD_COLLECTOR_HOST: 'rode-collector-build.rode.svc.cluster.local:8082'
+  HARBOR_HOST: 'harbor.services.liatr.io'
+  SONAR_HOST: 'https://sonarqube.services.liatr.io'
+  IMAGE: 'liatrio/rode-demo-node-app'
   DEPLOY_REPO: 'rode/demo-app-deployment'
   DEPLOY_REPO_BRANCH: 'dev'
-  OAUTH2_TOKEN_URL: 'https://keycloak.internal.lead.prod.liatr.io/auth/realms/rode-demo/protocol/openid-connect/token'
+  OAUTH2_TOKEN_URL: 'https://keycloak.services.liatr.io/auth/realms/rode-demo/protocol/openid-connect/token'
   OAUTH2_CLIENT_ID: rode-collector
 
 jobs:
@@ -26,6 +26,7 @@ jobs:
       - liatrio-runners-sharedsvc
     outputs:
       digest: ${{ steps.build.outputs.digest }}
+    environment: liatrio-sharedsvc
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -90,6 +91,7 @@ jobs:
     runs-on:
       - self-hosted
       - liatrio-runners-sharedsvc
+    environment: liatrio-sharedsvc
     needs:
       - build
     steps:
