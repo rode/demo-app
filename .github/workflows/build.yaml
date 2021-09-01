@@ -82,7 +82,6 @@ jobs:
           artifactNames: |
             ${{ env.HARBOR_HOST }}/${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
           buildCollectorHost: ${{ env.BUILD_COLLECTOR_HOST }}
-          buildCollectorInsecure: true
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
