@@ -10,7 +10,7 @@ on:
   push:
 
 env:
-  BUILD_COLLECTOR_HOST: 'rode-collector-build.rode.svc.cluster.local:8082'
+  BUILD_COLLECTOR_HOST: 'build-collector-grpc.services.liatr.io:443'
   HARBOR_HOST: 'harbor.services.liatr.io'
   SONAR_HOST: 'https://sonarqube.services.liatr.io'
   IMAGE: 'liatrio/rode-demo-node-app'
@@ -21,9 +21,7 @@ env:
 
 jobs:
   build:
-    runs-on:
-      - self-hosted
-      - liatrio-runners-sharedsvc
+    runs-on: ubuntu-latest
     outputs:
       digest: ${{ steps.build.outputs.digest }}
     environment: liatrio-sharedsvc
@@ -88,9 +86,7 @@ jobs:
 
   deploy:
     if: ${{ github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true' }}
-    runs-on:
-      - self-hosted
-      - liatrio-runners-sharedsvc
+    runs-on: ubuntu-latest
     environment: liatrio-sharedsvc
     needs:
       - build
