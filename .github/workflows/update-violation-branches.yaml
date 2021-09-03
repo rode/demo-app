@@ -2,15 +2,14 @@ name: "Update Policy Violation Branches"
 
 on:
   push:
-    branches: [main, update-branches]
+    branches: [main]
 
 jobs:
   update-branches:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-#        branch: ['fail-sonar-policy', 'fail-harbor-policy']
-        branch: ['test-workflow']
+        branch: ['fail-sonar-policy', 'fail-harbor-policy']
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
