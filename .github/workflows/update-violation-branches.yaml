@@ -1,0 +1,30 @@
+name: "Update Policy Violation Branches"
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  update-branches:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: ['fail-sonar-policy', 'fail-harbor-policy']
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Update Failure Branches
+        run: |
+          set -eu
+
+          echo "Updating ${BRANCH_NAME} with latest changes"
+
+          git config --local user.email "rode@liatrio.com"
+          git config --local user.name "rode-bot"
+
+          git fetch origin
+          git checkout "${BRANCH_NAME}"
+          git rebase origin/main
+          git push -f origin "${BRANCH_NAME}"
+        env:
+          BRANCH_NAME: ${{ matrix.branch }}
