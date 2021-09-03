@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        branch: ['fail-sonar-policy', 'fail-harbor-policy']
+#        branch: ['fail-sonar-policy', 'fail-harbor-policy']
+        branch: ['fail-sonar-policy']
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
