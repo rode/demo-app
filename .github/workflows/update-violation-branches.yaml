@@ -22,8 +22,8 @@ jobs:
           git config --local user.email "rode@liatrio.com"
           git config --local user.name "rode-bot"
 
+          git fetch origin
           git checkout "${BRANCH_NAME}"
-          git pull origin "${BRANCH_NAME}"
           git rebase main
         env:
           BRANCH_NAME: ${{ matrix.branch }}
