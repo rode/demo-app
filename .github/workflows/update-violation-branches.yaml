@@ -25,6 +25,6 @@ jobs:
 
           git fetch origin
           git checkout "${BRANCH_NAME}"
-          git rebase main
+          git rebase origin/main
         env:
           BRANCH_NAME: ${{ matrix.branch }}
