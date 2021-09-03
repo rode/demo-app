@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
 #        branch: ['fail-sonar-policy', 'fail-harbor-policy']
-        branch: ['fail-sonar-policy']
+        branch: ['test-workflow']
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -26,5 +26,6 @@ jobs:
           git fetch origin
           git checkout "${BRANCH_NAME}"
           git rebase origin/main
+          git push -f origin "${BRANCH_NAME}"
         env:
           BRANCH_NAME: ${{ matrix.branch }}
