@@ -38,6 +38,7 @@ pipeline {
                         image=sh(script: "cat image | tr -d '[:space:]'", returnStdout: true).trim()
                     }
                     sh '''
+		    git config --global --add safe.directory '*'
                     apk add --no-cache curl
                     buildStart=$(cat build-start)
                     buildEnd=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
